@@ -1,0 +1,14 @@
+# Секреты — НИКОГДА не коммитим
+.env
+.env.local
+
+# Сгенерированные артефакты прогонов
+out/
+out_portal_test/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/

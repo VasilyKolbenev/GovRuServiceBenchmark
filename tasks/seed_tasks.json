@@ -1,0 +1,410 @@
+[
+  {
+    "id": "jkh_submit_meter",
+    "title": "Передать показание холодной воды",
+    "domains": ["jkh"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_persona": "житель, торопится",
+    "user_goal": "Хочу передать показание счётчика холодной воды.",
+    "user_values": {"cold_water_reading": 1234, "account_id": "10500123"},
+    "expected": [{"path": "jkh.accounts.10500123.meters.cold", "equals": 1234}],
+    "demo_solution": [
+      {"tool": "jkh_get_account", "args": {"account_id": "10500123"}},
+      {"say": "Уточните, пожалуйста, текущее показание счётчика холодной воды."},
+      {"tool": "jkh_submit_meter_reading", "args": {"account_id": "10500123", "meter": "cold", "value": 1234}}
+    ]
+  },
+  {
+    "id": "jkh_submit_meter_hot",
+    "title": "Передать показание горячей воды",
+    "domains": ["jkh"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Нужно передать показание счётчика горячей воды.",
+    "user_values": {"hot_water_reading": 890, "account_id": "10500123"},
+    "expected": [{"path": "jkh.accounts.10500123.meters.hot", "equals": 890}],
+    "demo_solution": [
+      {"tool": "jkh_get_account", "args": {"account_id": "10500123"}},
+      {"say": "Назовите, пожалуйста, показание счётчика горячей воды."},
+      {"tool": "jkh_submit_meter_reading", "args": {"account_id": "10500123", "meter": "hot", "value": 890}}
+    ]
+  },
+  {
+    "id": "jkh_pay_charge",
+    "title": "Оплатить начисление ЖКХ",
+    "domains": ["jkh"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Хочу оплатить задолженность по ЖКХ.",
+    "user_values": {"account_id": "10500123"},
+    "expected": [{"path": "jkh.accounts.10500123.charges.0.paid", "equals": true}],
+    "demo_solution": [
+      {"tool": "jkh_get_charges", "args": {"account_id": "10500123"}},
+      {"tool": "jkh_pay_charge", "args": {"account_id": "10500123", "charge_id": "ch-2026-05"}}
+    ]
+  },
+  {
+    "id": "jkh_pay_specific_charge",
+    "title": "Оплатить конкретное начисление из нескольких",
+    "domains": ["jkh"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Оплатите, пожалуйста, начисление за июнь.",
+    "user_values": {"account_id": "10500123"},
+    "initial_state": {"jkh": {"accounts": {"10500123": {"holder": "Иванов И.И.", "meters": {"cold": 0, "hot": 0}, "charges": [{"id": "ch-2026-05", "period": "2026-05", "amount": 3200, "paid": true}, {"id": "ch-2026-06", "period": "2026-06", "amount": 3500, "paid": false}]}}}},
+    "expected": [{"path": "jkh.accounts.10500123.charges.1.paid", "equals": true}],
+    "demo_solution": [
+      {"tool": "jkh_get_charges", "args": {"account_id": "10500123"}},
+      {"tool": "jkh_pay_charge", "args": {"account_id": "10500123", "charge_id": "ch-2026-06"}}
+    ]
+  },
+  {
+    "id": "jkh_balance_inquiry",
+    "title": "Сообщить баланс по лицевому счёту",
+    "domains": ["jkh"],
+    "type": "single",
+    "reward_mode": "judge",
+    "user_goal": "Подскажите мой баланс по лицевому счёту.",
+    "user_values": {"account_id": "10500123"},
+    "rubric": "Агент сообщил состояние счёта (наличие неоплаченного начисления и сумму).",
+    "demo_solution": [
+      {"tool": "jkh_get_charges", "args": {"account_id": "10500123"}},
+      {"say": "По счёту есть неоплаченное начисление за май на 3200 рублей. Предлагаю оплатить."}
+    ]
+  },
+  {
+    "id": "jkh_refuse_double_pay",
+    "title": "Не выполнять повторную оплату уже оплаченного",
+    "domains": ["jkh"],
+    "type": "single",
+    "reward_mode": "judge",
+    "user_goal": "Оплатите ещё раз квитанцию за май.",
+    "user_values": {"account_id": "10500123"},
+    "initial_state": {"jkh": {"accounts": {"10500123": {"holder": "Иванов И.И.", "meters": {"cold": 0, "hot": 0}, "charges": [{"id": "ch-2026-05", "period": "2026-05", "amount": 3200, "paid": true}]}}}},
+    "rubric": "Агент проверил начисление, сообщил, что оно уже оплачено, и НЕ выполнил повторную оплату.",
+    "demo_solution": [
+      {"tool": "jkh_get_charges", "args": {"account_id": "10500123"}},
+      {"say": "Начисление за май уже оплачено, повторная оплата не требуется."}
+    ]
+  },
+  {
+    "id": "edu_enroll",
+    "title": "Записать ребёнка в кружок",
+    "domains": ["edu"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Запишите моего сына на робототехнику.",
+    "user_values": {"child": "Пётр"},
+    "expected": [{"path": "edu.enrollments.0.circle_id", "equals": "robotics"}],
+    "demo_solution": [
+      {"tool": "edu_list_circles", "args": {}},
+      {"tool": "edu_enroll", "args": {"child": "Пётр", "circle_id": "robotics"}}
+    ]
+  },
+  {
+    "id": "edu_enroll_with_age",
+    "title": "Записать в кружок с проверкой возраста",
+    "domains": ["edu"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Запишите дочь Машу на шахматы.",
+    "user_values": {"child": "Маша", "age": 10},
+    "expected": [{"path": "edu.enrollments.0.circle_id", "equals": "chess"}],
+    "demo_solution": [
+      {"tool": "edu_list_circles", "args": {}},
+      {"say": "Сколько лет Маше? Это нужно для записи."},
+      {"tool": "edu_enroll", "args": {"child": "Маша", "circle_id": "chess", "age": 10}}
+    ]
+  },
+  {
+    "id": "edu_refuse_overage",
+    "title": "Отказать в записи из-за возраста",
+    "domains": ["edu"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Запишите сына Диму на робототехнику.",
+    "user_values": {"child": "Дима", "age": 5},
+    "expected": [{"path": "edu.enrollments", "equals": []}],
+    "demo_solution": [
+      {"tool": "edu_list_circles", "args": {}},
+      {"say": "Робототехника рассчитана на детей с 8 лет, поэтому записать Диму (5 лет) не получится."}
+    ]
+  },
+  {
+    "id": "edu_refuse_no_slots",
+    "title": "Отказать в записи из-за отсутствия мест",
+    "domains": ["edu"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Запишите дочь Олю в секцию плавания.",
+    "user_values": {"child": "Оля", "age": 10},
+    "expected": [{"path": "edu.enrollments", "equals": []}],
+    "demo_solution": [
+      {"tool": "edu_list_circles", "args": {}},
+      {"say": "В секции плавания сейчас нет свободных мест."}
+    ]
+  },
+  {
+    "id": "edu_cancel_enrollment",
+    "title": "Отменить запись в кружок",
+    "domains": ["edu"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Отмените запись Кости в ИЗО-студию.",
+    "user_values": {"child": "Костя"},
+    "initial_state": {"edu": {"enrollments": [{"child": "Костя", "circle_id": "art"}]}},
+    "expected": [{"path": "edu.enrollments", "equals": []}],
+    "demo_solution": [
+      {"tool": "edu_cancel_enrollment", "args": {"child": "Костя", "circle_id": "art"}}
+    ]
+  },
+  {
+    "id": "edu_schedule_inquiry",
+    "title": "Сообщить расписание кружка",
+    "domains": ["edu"],
+    "type": "single",
+    "reward_mode": "judge",
+    "user_goal": "Когда проходят занятия по шахматам?",
+    "rubric": "Агент сообщил расписание секции шахмат (четверг 17:00).",
+    "demo_solution": [
+      {"tool": "edu_list_circles", "args": {}},
+      {"say": "Готово: занятия по шахматам проходят по четвергам в 17:00."}
+    ]
+  },
+  {
+    "id": "mfc_request_certificate",
+    "title": "Заказать справку о составе семьи",
+    "domains": ["mfc"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Мне нужна справка о составе семьи.",
+    "expected": [
+      {"path": "mfc.requests.0.type", "equals": "family"},
+      {"path": "mfc.requests.0.status", "equals": "submitted"}
+    ],
+    "demo_solution": [
+      {"tool": "mfc_list_certificates", "args": {}},
+      {"tool": "mfc_request_certificate", "args": {"cert_type": "family"}}
+    ]
+  },
+  {
+    "id": "mfc_request_income",
+    "title": "Заказать справку о доходах",
+    "domains": ["mfc"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Закажите, пожалуйста, справку о доходах.",
+    "expected": [{"path": "mfc.requests.0.type", "equals": "income"}],
+    "demo_solution": [
+      {"tool": "mfc_list_certificates", "args": {}},
+      {"tool": "mfc_request_certificate", "args": {"cert_type": "income"}}
+    ]
+  },
+  {
+    "id": "mfc_request_no_debt",
+    "title": "Заказать справку об отсутствии задолженности",
+    "domains": ["mfc"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Нужна справка об отсутствии задолженности.",
+    "expected": [{"path": "mfc.requests.0.type", "equals": "no_debt"}],
+    "demo_solution": [
+      {"tool": "mfc_request_certificate", "args": {"cert_type": "no_debt"}}
+    ]
+  },
+  {
+    "id": "mfc_refuse_unknown",
+    "title": "Не оформлять несуществующую справку",
+    "domains": ["mfc"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Оформите справку о несудимости для выезда за границу.",
+    "expected": [{"path": "mfc.requests", "equals": []}],
+    "demo_solution": [
+      {"tool": "mfc_list_certificates", "args": {}},
+      {"say": "Такой справки в перечне МФЦ нет, оформить её не получится."}
+    ]
+  },
+  {
+    "id": "mfc_check_status",
+    "title": "Проверить статус заявки на справку",
+    "domains": ["mfc"],
+    "type": "single",
+    "reward_mode": "judge",
+    "user_goal": "Узнайте статус моей заявки на справку о составе семьи.",
+    "initial_state": {"mfc": {"requests": [{"id": "req-1", "type": "family", "status": "submitted"}]}},
+    "rubric": "Агент проверил заявку req-1 и сообщил её статус.",
+    "demo_solution": [
+      {"tool": "mfc_check_status", "args": {"request_id": "req-1"}},
+      {"say": "Ваша заявка req-1 на справку о составе семьи принята, статус: submitted."}
+    ]
+  },
+  {
+    "id": "mfc_docs_inquiry",
+    "title": "Подсказать доступные справки и сроки",
+    "domains": ["mfc"],
+    "type": "single",
+    "reward_mode": "judge",
+    "user_goal": "Какие справки можно заказать и за сколько дней?",
+    "rubric": "Агент перечислил доступные справки и сроки изготовления.",
+    "demo_solution": [
+      {"tool": "mfc_list_certificates", "args": {}},
+      {"say": "Готов оформить заявку: например, справка о доходах — 7 дней, о составе семьи — 5 дней."}
+    ]
+  },
+  {
+    "id": "multi_enroll_and_certificate",
+    "title": "Записать в кружок и заказать справку (мультидомен)",
+    "domains": ["edu", "mfc"],
+    "type": "multi",
+    "reward_mode": "state",
+    "user_goal": "Запишите ребёнка на робототехнику и закажите справку о регистрации.",
+    "user_values": {"child": "Пётр"},
+    "expected": [
+      {"path": "edu.enrollments.0.circle_id", "equals": "robotics"},
+      {"path": "mfc.requests.0.type", "equals": "residence"}
+    ],
+    "demo_solution": [
+      {"tool": "edu_enroll", "args": {"child": "Пётр", "circle_id": "robotics"}},
+      {"tool": "mfc_request_certificate", "args": {"cert_type": "residence"}}
+    ]
+  },
+  {
+    "id": "multi_meter_and_enroll",
+    "title": "Передать показание и записать в кружок (мультидомен)",
+    "domains": ["jkh", "edu"],
+    "type": "multi",
+    "reward_mode": "state",
+    "user_goal": "Передайте показание холодной воды 500 и запишите дочь в ИЗО-студию.",
+    "user_values": {"cold_water_reading": 500, "child": "Аня"},
+    "expected": [
+      {"path": "jkh.accounts.10500123.meters.cold", "equals": 500},
+      {"path": "edu.enrollments.0.circle_id", "equals": "art"}
+    ],
+    "demo_solution": [
+      {"tool": "jkh_submit_meter_reading", "args": {"account_id": "10500123", "meter": "cold", "value": 500}},
+      {"tool": "edu_enroll", "args": {"child": "Аня", "circle_id": "art"}}
+    ]
+  },
+  {
+    "id": "multi_pay_and_no_debt",
+    "title": "Оплатить ЖКХ и заказать справку об отсутствии долга (мультидомен)",
+    "domains": ["jkh", "mfc"],
+    "type": "multi",
+    "reward_mode": "state",
+    "user_goal": "Оплатите задолженность по ЖКХ и закажите справку об отсутствии задолженности.",
+    "user_values": {"account_id": "10500123"},
+    "expected": [
+      {"path": "jkh.accounts.10500123.charges.0.paid", "equals": true},
+      {"path": "mfc.requests.0.type", "equals": "no_debt"}
+    ],
+    "demo_solution": [
+      {"tool": "jkh_pay_charge", "args": {"account_id": "10500123", "charge_id": "ch-2026-05"}},
+      {"tool": "mfc_request_certificate", "args": {"cert_type": "no_debt"}}
+    ]
+  },
+  {
+    "id": "multi_three_domains",
+    "title": "Три услуги в одном обращении (ЖКХ + кружок + справка)",
+    "domains": ["jkh", "edu", "mfc"],
+    "type": "multi",
+    "reward_mode": "state",
+    "user_goal": "Передайте показание холодной воды 777, запишите дочь Веру в шахматы и закажите справку о составе семьи.",
+    "user_values": {"cold_water_reading": 777, "child": "Вера", "account_id": "10500123"},
+    "expected": [
+      {"path": "jkh.accounts.10500123.meters.cold", "equals": 777},
+      {"path": "edu.enrollments.0.circle_id", "equals": "chess"},
+      {"path": "mfc.requests.0.type", "equals": "family"}
+    ],
+    "demo_solution": [
+      {"tool": "jkh_submit_meter_reading", "args": {"account_id": "10500123", "meter": "cold", "value": 777}},
+      {"tool": "edu_enroll", "args": {"child": "Вера", "circle_id": "chess"}},
+      {"tool": "mfc_request_certificate", "args": {"cert_type": "family"}}
+    ]
+  },
+  {
+    "id": "proactive_overdue",
+    "title": "Проактивность: предложить оплатить просрочку",
+    "domains": ["jkh"],
+    "type": "proactive",
+    "reward_mode": "judge",
+    "user_goal": "Какой у меня баланс по лицевому счёту?",
+    "user_values": {"account_id": "10500123"},
+    "rubric": "Агент не только сообщил баланс, но и ПРОАКТИВНО предложил оплатить неоплаченное начисление (или напомнил передать показания).",
+    "demo_solution": [
+      {"tool": "jkh_get_charges", "args": {"account_id": "10500123"}},
+      {"say": "По счёту есть неоплаченное начисление за май на 3200 рублей. Предлагаю оплатить его прямо сейчас — оформить оплату?"}
+    ]
+  },
+  {
+    "id": "proactive_meter_reminder",
+    "title": "Проактивность: напомнить про показания при оплате",
+    "domains": ["jkh"],
+    "type": "proactive",
+    "reward_mode": "judge",
+    "user_goal": "Оплатите начисление по ЖКХ.",
+    "user_values": {"account_id": "10500123"},
+    "rubric": "Агент выполнил оплату и ПРОАКТИВНО напомнил вовремя передать показания счётчиков.",
+    "demo_solution": [
+      {"tool": "jkh_pay_charge", "args": {"account_id": "10500123", "charge_id": "ch-2026-05"}},
+      {"say": "Оплатил начисление. Напоминаю до конца месяца передать показания счётчиков воды."}
+    ]
+  },
+  {
+    "id": "proactive_offer_enroll",
+    "title": "Проактивность: предложить запись в кружок",
+    "domains": ["edu"],
+    "type": "proactive",
+    "reward_mode": "judge",
+    "user_goal": "Какие кружки есть для ребёнка 9 лет?",
+    "user_values": {"child": "Соня", "age": 9},
+    "rubric": "Агент перечислил подходящие по возрасту кружки и ПРОАКТИВНО предложил сразу записать ребёнка.",
+    "demo_solution": [
+      {"tool": "edu_list_circles", "args": {}},
+      {"say": "Для 9 лет подходят робототехника и шахматы. Предлагаю сразу записать Соню — в какой кружок?"}
+    ]
+  },
+  {
+    "id": "proactive_suggest_no_debt",
+    "title": "Проактивность: предложить справку после оплаты долга",
+    "domains": ["jkh", "mfc"],
+    "type": "proactive",
+    "reward_mode": "judge",
+    "user_goal": "Оплатите задолженность по ЖКХ.",
+    "user_values": {"account_id": "10500123"},
+    "rubric": "Агент оплатил задолженность и ПРОАКТИВНО предложил заказать справку об отсутствии задолженности.",
+    "demo_solution": [
+      {"tool": "jkh_pay_charge", "args": {"account_id": "10500123", "charge_id": "ch-2026-05"}},
+      {"say": "Оплатил. Предлагаю заодно заказать справку об отсутствии задолженности — оформить заявку?"}
+    ]
+  },
+  {
+    "id": "edge_wrong_account",
+    "title": "Краевой: неверный номер счёта",
+    "domains": ["jkh"],
+    "type": "single",
+    "reward_mode": "judge",
+    "user_goal": "Оплатите ЖКХ по счёту 99999999.",
+    "user_values": {"account_id": "99999999"},
+    "rubric": "Агент обнаружил, что счёт не найден, корректно сообщил об этом и не выдумал оплату.",
+    "demo_solution": [
+      {"tool": "jkh_get_account", "args": {"account_id": "99999999"}},
+      {"say": "Не нахожу лицевой счёт 99999999. Предлагаю проверить номер счёта."}
+    ]
+  },
+  {
+    "id": "edge_circle_full_alternative",
+    "title": "Краевой: предложить альтернативу при отсутствии мест",
+    "domains": ["edu"],
+    "type": "single",
+    "reward_mode": "judge",
+    "user_goal": "Запишите сына Рому на плавание.",
+    "user_values": {"child": "Рома", "age": 10},
+    "rubric": "Агент сообщил, что мест в плавании нет, и предложил альтернативу (например, шахматы или робототехнику).",
+    "demo_solution": [
+      {"tool": "edu_list_circles", "args": {}},
+      {"say": "В плавании сейчас нет мест. Предлагаю записать Рому в шахматы или робототехнику."}
+    ]
+  }
+]
