@@ -88,7 +88,7 @@ def _make(provider: str, model: str, key: str) -> LLMClient:
         return FakeLLM()
     if provider == "anthropic":
         _require_key(key, "ANTHROPIC_API_KEY")
-        return AnthropicLLM(model or "claude-opus-4-8", key)
+        return AnthropicLLM(model, key)  # модель задаётся через LLM_MODEL
     if provider == "openai":
         _require_key(key, "OPENAI_API_KEY")
         return OpenAILLM(model or "gpt-5.5", key)
