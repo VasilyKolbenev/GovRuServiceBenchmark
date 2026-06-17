@@ -1,0 +1,132 @@
+[
+  {
+    "id": "jkh_pay_charge",
+    "title": "Оплатить начисление ЖКХ",
+    "domains": ["jkh"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Хочу оплатить задолженность по ЖКХ.",
+    "user_values": {"account_id": "10500123"},
+    "expected": [{"path": "jkh.accounts.10500123.charges.0.paid", "equals": true}],
+    "demo_solution": [
+      {"tool": "jkh_get_charges", "args": {"account_id": "10500123"}},
+      {"tool": "jkh_pay_charge", "args": {"account_id": "10500123", "charge_id": "ch-2026-05"}}
+    ]
+  },
+  {
+    "id": "jkh_balance_inquiry",
+    "title": "Сообщить баланс по лицевому счёту",
+    "domains": ["jkh"],
+    "type": "single",
+    "reward_mode": "judge",
+    "user_goal": "Подскажите мой баланс по лицевому счёту.",
+    "user_values": {"account_id": "10500123"},
+    "rubric": "Агент сообщил состояние счёта (наличие неоплаченного начисления и сумму).",
+    "demo_solution": [
+      {"tool": "jkh_get_charges", "args": {"account_id": "10500123"}},
+      {"say": "По счёту есть неоплаченное начисление за май на 3200 рублей. Предлагаю оплатить."}
+    ]
+  },
+  {
+    "id": "edu_enroll",
+    "title": "Записать ребёнка в кружок",
+    "domains": ["edu"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Запишите моего сына на робототехнику.",
+    "user_values": {"child": "Пётр"},
+    "expected": [{"path": "edu.enrollments.0.circle_id", "equals": "robotics"}],
+    "demo_solution": [
+      {"tool": "edu_list_circles", "args": {}},
+      {"tool": "edu_enroll", "args": {"child": "Пётр", "circle_id": "robotics"}}
+    ]
+  },
+  {
+    "id": "edu_refuse_overage",
+    "title": "Отказать в записи из-за возраста",
+    "domains": ["edu"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Запишите сына Диму на робототехнику.",
+    "user_values": {"child": "Дима", "age": 5},
+    "expected": [{"path": "edu.enrollments", "equals": []}],
+    "demo_solution": [
+      {"tool": "edu_list_circles", "args": {}},
+      {"say": "Робототехника рассчитана на детей с 8 лет, поэтому записать Диму (5 лет) не получится."}
+    ]
+  },
+  {
+    "id": "mfc_request_certificate",
+    "title": "Заказать справку о составе семьи",
+    "domains": ["mfc"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Мне нужна справка о составе семьи.",
+    "expected": [
+      {"path": "mfc.requests.0.type", "equals": "family"},
+      {"path": "mfc.requests.0.status", "equals": "submitted"}
+    ],
+    "demo_solution": [
+      {"tool": "mfc_list_certificates", "args": {}},
+      {"tool": "mfc_request_certificate", "args": {"cert_type": "family"}}
+    ]
+  },
+  {
+    "id": "mfc_docs_inquiry",
+    "title": "Подсказать доступные справки и сроки",
+    "domains": ["mfc"],
+    "type": "single",
+    "reward_mode": "judge",
+    "user_goal": "Какие справки можно заказать и за сколько дней?",
+    "rubric": "Агент перечислил доступные справки и сроки изготовления.",
+    "demo_solution": [
+      {"tool": "mfc_list_certificates", "args": {}},
+      {"say": "Готов оформить заявку: например, справка о доходах — 7 дней, о составе семьи — 5 дней."}
+    ]
+  },
+  {
+    "id": "transport_pay_fine",
+    "title": "Оплатить штраф ГИБДД",
+    "domains": ["transport"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Хочу оплатить свой штраф ГИБДД.",
+    "expected": [{"path": "transport.fines.0.paid", "equals": true}],
+    "demo_solution": [
+      {"tool": "transport_list_fines", "args": {}},
+      {"tool": "transport_pay_fine", "args": {"fine_id": "f-2026-001"}}
+    ]
+  },
+  {
+    "id": "transport_proactive_offer_pay",
+    "title": "Проактивность: предложить оплатить штраф",
+    "domains": ["transport"],
+    "type": "proactive",
+    "reward_mode": "judge",
+    "user_goal": "Покажите мои штрафы ГИБДД.",
+    "rubric": "Агент не только перечислил штрафы, но и ПРОАКТИВНО предложил сразу оплатить неоплаченный.",
+    "demo_solution": [
+      {"tool": "transport_list_fines", "args": {}},
+      {"say": "Есть неоплаченный штраф на 500 рублей. Предлагаю оплатить его прямо сейчас — оформить оплату?"}
+    ]
+  },
+  {
+    "id": "multi_three_domains",
+    "title": "Три услуги в одном обращении (ЖКХ + кружок + справка)",
+    "domains": ["jkh", "edu", "mfc"],
+    "type": "multi",
+    "reward_mode": "state",
+    "user_goal": "Передайте показание холодной воды 777, запишите дочь Веру в шахматы и закажите справку о составе семьи.",
+    "user_values": {"cold_water_reading": 777, "child": "Вера", "account_id": "10500123"},
+    "expected": [
+      {"path": "jkh.accounts.10500123.meters.cold", "equals": 777},
+      {"path": "edu.enrollments.0.circle_id", "equals": "chess"},
+      {"path": "mfc.requests.0.type", "equals": "family"}
+    ],
+    "demo_solution": [
+      {"tool": "jkh_submit_meter_reading", "args": {"account_id": "10500123", "meter": "cold", "value": 777}},
+      {"tool": "edu_enroll", "args": {"child": "Вера", "circle_id": "chess"}},
+      {"tool": "mfc_request_certificate", "args": {"cert_type": "family"}}
+    ]
+  }
+]
