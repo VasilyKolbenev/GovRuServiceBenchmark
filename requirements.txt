@@ -3,4 +3,4 @@
 httpx>=0.27          # вызовы GovTech 1.0 / A2A endpoint 2.0
 # Выберите клиент вашей фронтир-модели для симулятора/судьи:
 # anthropic>=0.40
-openai>=2.0          # симулятор пользователя, судья и референс-агент (GPT-5-семейство)
+openai>=2.0          # клиент всех OpenAI-совместимых вендоров (OpenAI/DeepSeek/Qwen/GLM/Mistral/Gemini/YandexGPT…)

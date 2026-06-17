@@ -51,8 +51,14 @@ python run_eval.py --agent reference --limit 3             # первые 3 за
 
 ## Переключение провайдера и модели
 
-В `.env`: `LLM_PROVIDER` (`fake`/`openai`/`anthropic`), `LLM_MODEL`. Судью можно вынести на
-отдельную модель (чтобы не оценивал «сам себя») через `LLM_JUDGE_PROVIDER`/`LLM_JUDGE_MODEL`/`LLM_JUDGE_API_KEY`.
+`LLM_PROVIDER` в `.env`: `fake` · `openai` · `deepseek` · `qwen` · `glm` · `moonshot` ·
+`mistral` · `gemini` · `yandex` · `anthropic` · `gigachat`. Большинство — OpenAI-совместимы
+(base_url зашит); любой другой такой вендор — `LLM_PROVIDER=openai` + `LLM_BASE_URL=<url>`.
+Модель — `LLM_MODEL` (для YandexGPT: `gpt://<folder>/yandexgpt/latest`).
+
+Судью лучше вынести на **отдельный вендор** (чтобы не оценивал «сам себя») —
+`LLM_JUDGE_PROVIDER` / `LLM_JUDGE_MODEL` / `LLM_JUDGE_API_KEY` / `LLM_JUDGE_BASE_URL`.
+Anthropic и GigaChat — пока заглушки.
 
 ## Тесты
 
