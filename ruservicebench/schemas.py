@@ -14,7 +14,7 @@ class TaskType(str, Enum):
 
 class RewardMode(str, Enum):
     STATE = "state"  # сверка финального состояния песочницы с ожидаемым
-    JUDGE = "judge"  # LLM-судья по цели/рубрике (нужно для ЦАМ 1.0 без инструментов в песочнице)
+    JUDGE = "judge"  # LLM-судья по цели/рубрике (нужно для GovTech 1.0 без инструментов в песочнице)
 
 
 @dataclass

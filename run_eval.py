@@ -6,9 +6,9 @@
   python run_eval.py --dry-run --k 5
 
   # реальный прогон (после реализации адаптеров и настройки .env):
-  python run_eval.py --agent cam1 --k 5            # baseline (старый ЦАМ)
+  python run_eval.py --agent gov1 --k 5            # baseline (старый GovTech)
   python run_eval.py --agent reference --k 5       # референсный агентный baseline
-  python run_eval.py --agent cam2 --k 5            # новый ЦАМ 2.0 (когда запустится)
+  python run_eval.py --agent gov2 --k 5            # новый GovTech 2.0 (когда запустится)
 """
 from __future__ import annotations
 import argparse
@@ -72,7 +72,7 @@ def main():
     load_dotenv()
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--agent", default="reference", choices=["demo", "reference", "cam1", "cam2"])
+    ap.add_argument("--agent", default="reference", choices=["demo", "reference", "gov1", "gov2"])
     ap.add_argument("--tasks", default="tasks/seed_tasks.json")
     ap.add_argument("--runs", type=int, default=10, help="прогонов на задачу (n); для pass^k нужно n>k")
     ap.add_argument("--k", type=int, default=5, help="макс. k для кривой pass^k (k<=runs)")

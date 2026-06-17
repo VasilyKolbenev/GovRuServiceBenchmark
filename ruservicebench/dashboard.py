@@ -228,15 +228,15 @@ def _lights(by_domain: dict[str, Any], k_max: int) -> str:
 def _version_panel(agent_name: str, passk: float, k_max: int) -> str:
     """Панель «готовность по версиям»: подсвечивает текущего агента, остальные — заглушки/планка."""
     name = agent_name.lower()
-    cards = [("cam1", "ЦАМ 1.0", "baseline · классификаторы"),
+    cards = [("gov1", "GovTech 1.0", "baseline · классификаторы"),
              ("reference", "Референс · GPT-5.5", "агентный baseline"),
-             ("cam2", "ЦАМ 2.0", "A2A · приёмочная планка")]
+             ("gov2", "GovTech 2.0", "A2A · приёмочная планка")]
     out = []
     for key, title, desc in cards:
         hi = key in name
         if hi:
             badge = f'<span class="badge hi">pass^{k_max} {_pct(passk)}</span>'
-        elif key == "cam2":
+        elif key == "gov2":
             badge = '<span class="badge">цель: pass^k выше</span>'
         else:
             badge = '<span class="badge">будет измерено</span>'

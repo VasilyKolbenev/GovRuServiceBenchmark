@@ -1,8 +1,8 @@
 """Агенты под тестом. Один интерфейс — несколько реализаций:
   - DemoAgent          — детерминированный «демо»-агент для dry-run/проверки пайплайна (НЕ для метрик).
   - ReferenceReactAgent — референсный агентный baseline (ReAct + наши инструменты) на фронтир-модели. TODO.
-  - Cam1Adapter         — старый ЦАМ 1.0 (классификаторы). TODO: вызов его API; обычно judge-режим.
-  - Cam2Adapter         — новый ЦАМ 2.0 по A2A (Task/TaskResult). TODO: подключить, когда 2.0 запустится.
+  - Gov1Adapter         — старый GovTech 1.0 (классификаторы). TODO: вызов его API; обычно judge-режим.
+  - Gov2Adapter         — новый GovTech 2.0 по A2A (Task/TaskResult). TODO: подключить, когда 2.0 запустится.
 Все гоняются по одним задачам в одной песочнице -> метрики сравнимы."""
 from __future__ import annotations
 import json
@@ -110,7 +110,7 @@ def _apply_tool(env: Environment, action: dict[str, Any], res: RunResult) -> str
 
 class ReferenceReactAgent(Agent):
     """Референсный агентный baseline: ReAct-цикл на фронтир-модели + инструменты песочницы.
-    Показывает «что в принципе даёт агентный подход» до запуска ЦАМ 2.0."""
+    Показывает «что в принципе даёт агентный подход» до запуска GovTech 2.0."""
     name = "reference"
 
     def __init__(self, llm: LLMClient):
@@ -149,36 +149,36 @@ class ReferenceReactAgent(Agent):
         return res
 
 
-class Cam1Adapter(Agent):
-    """ЦАМ 1.0 (baseline). Классификаторы + зашитая логика, без вызова наших инструментов,
+class Gov1Adapter(Agent):
+    """GovTech 1.0 (baseline). Классификаторы + зашитая логика, без вызова наших инструментов,
     поэтому обычно оценивается в JUDGE-режиме (по диалогу/достижению цели)."""
-    name = "cam1"
+    name = "gov1"
 
     def __init__(self, endpoint: str | None = None, token: str | None = None):
-        self.endpoint = endpoint or os.getenv("CAM1_ENDPOINT", "")
-        self.token = token or os.getenv("CAM1_TOKEN", "")
+        self.endpoint = endpoint or os.getenv("GOV1_ENDPOINT", "")
+        self.token = token or os.getenv("GOV1_TOKEN", "")
 
     def run(self, task, env, user, max_turns=8):
-        # TODO: вести диалог с API старого ЦАМ:
+        # TODO: вести диалог с API старого GovTech:
         #  msg = user.first_message(); пока не конец: resp = POST endpoint {session, msg}; user.reply(resp);
         #  собрать transcript. Состояние песочницы 1.0 обычно НЕ меняет -> reward_mode=JUDGE.
-        raise NotImplementedError("Подключите API ЦАМ 1.0 (CAM1_ENDPOINT) и реализуйте диалог.")
+        raise NotImplementedError("Подключите API GovTech 1.0 (GOV1_ENDPOINT) и реализуйте диалог.")
 
 
-class Cam2Adapter(Agent):
-    """ЦАМ 2.0 по A2A: шлём Task {intent, context, session_id}, читаем TaskResult,
+class Gov2Adapter(Agent):
+    """GovTech 2.0 по A2A: шлём Task {intent, context, session_id}, читаем TaskResult,
     инструменты 2.0 перенаправлены на нашу песочницу -> reward_mode=STATE."""
-    name = "cam2"
+    name = "gov2"
 
     def __init__(self, endpoint: str | None = None, token: str | None = None):
-        self.endpoint = endpoint or os.getenv("CAM2_A2A_ENDPOINT", "")
-        self.token = token or os.getenv("CAM2_TOKEN", "")
+        self.endpoint = endpoint or os.getenv("GOV2_A2A_ENDPOINT", "")
+        self.token = token or os.getenv("GOV2_TOKEN", "")
 
     def run(self, task, env, user, max_turns=8):
         # TODO: сформировать A2A Task {intent: task.user_goal, context: {...}, session_id};
         #  POST на A2A endpoint; обрабатывать TaskResult {answer, confidence} и промежуточные вызовы;
         #  убедиться, что инструменты 2.0 ходят в нашу Environment (staging).
-        raise NotImplementedError("Подключите A2A endpoint ЦАМ 2.0, когда он запустится.")
+        raise NotImplementedError("Подключите A2A endpoint GovTech 2.0, когда он запустится.")
 
 
 def build_agent(kind: str, llm: LLMClient, **kw) -> Agent:
@@ -186,8 +186,8 @@ def build_agent(kind: str, llm: LLMClient, **kw) -> Agent:
         return DemoAgent(**kw)
     if kind == "reference":
         return ReferenceReactAgent(llm)
-    if kind == "cam1":
-        return Cam1Adapter()
-    if kind == "cam2":
-        return Cam2Adapter()
+    if kind == "gov1":
+        return Gov1Adapter()
+    if kind == "gov2":
+        return Gov2Adapter()
     raise ValueError(f"unknown agent: {kind}")

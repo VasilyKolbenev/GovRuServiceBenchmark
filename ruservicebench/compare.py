@@ -1,4 +1,4 @@
-"""Сравнительный отчёт по нескольким агентам (ЦАМ 1.0 / Референс / ЦАМ 2.0).
+"""Сравнительный отчёт по нескольким агентам (GovTech 1.0 / Референс / GovTech 2.0).
 Каждый прогон сохраняет свою сводку в out/agents/<name>.json; отчёт читает их все
 и рендерит out/compare.md + out/compare.html (надёжность pass^k по версиям)."""
 from __future__ import annotations
@@ -94,7 +94,7 @@ def write_comparison(out_dir: str) -> str | None:
         f'<div class="card">{_svg_compare_bars(agents)}</div>'
         f'<table><thead><tr><th>Агент</th><th>pass¹</th><th>pass^{k}</th><th>разрыв</th>'
         f'<th>задач</th><th>ток./прогон</th></tr></thead><tbody>{table_rows}</tbody></table>'
-        '<p class="note">Цель ЦАМ 2.0 — обойти 1.0 и закрыть разрыв по надёжности pass^k, '
+        '<p class="note">Цель GovTech 2.0 — обойти 1.0 и закрыть разрыв по надёжности pass^k, '
         'а не только по среднему успеху. Сравнение накапливается между прогонами разных агентов.</p>')
     html = (f'<!DOCTYPE html>\n<html lang="ru"><head><meta charset="utf-8">'
             f'<meta name="viewport" content="width=device-width, initial-scale=1">'

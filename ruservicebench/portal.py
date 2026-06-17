@@ -54,7 +54,7 @@ def _tab_compare(out_dir, agent_name, passk, k_max):
     agents, kc = _compare_rows(out_dir)
     if len(agents) < 2:
         return ('<p class="role">Пока подключён один агент. Прогоните другие версии '
-                '(<code>--agent cam1</code> / <code>cam2</code>) — сравнение появится здесь автоматически.</p>'
+                '(<code>--agent gov1</code> / <code>gov2</code>) — сравнение появится здесь автоматически.</p>'
                 f'<p class="sec">Готовность по версиям</p>'
                 f'<div class="vers">{_version_panel(agent_name, passk, k_max)}</div>')
     rows = "".join(
@@ -119,8 +119,8 @@ def _tab_methodology(k_max):
         'JUDGE — LLM-судья по цели/рубрике (для проактивности и диалоговых задач).</p>'
         '<p class="sec">Честная граница</p><p class="role">Стенд доказывает корректность, оркестрацию и '
         'проактивность на сценариях в мок-песочнице. Боевой A/B в проде — отдельный трек, не часть стенда.</p>'
-        '<p class="sec">Статус версий</p><p class="role">ЦАМ 1.0 — baseline (нужен endpoint); '
-        'Reference (GPT-5.5) — агентный baseline; ЦАМ 2.0 — приёмочный контур (когда запустится).</p>')
+        '<p class="sec">Статус версий</p><p class="role">GovTech 1.0 — baseline (нужен endpoint); '
+        'Reference (GPT-5.5) — агентный baseline; GovTech 2.0 — приёмочный контур (когда запустится).</p>')
 
 
 def write_portal(summary: dict[str, Any], agent_name: str, out_dir: str,

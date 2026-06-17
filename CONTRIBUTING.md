@@ -25,7 +25,7 @@
 
 [`ruservicebench/environments.py`](ruservicebench/environments.py): состояние в `DEFAULT`,
 методы-инструменты и их описание в `tool_specs()`. Сверяйте сигнатуры с реальными
-MCP-инструментами ЦАМ (см. [docs/INTEGRATION_CAM.md](docs/INTEGRATION_CAM.md)).
+MCP-инструментами GovTech (см. [docs/INTEGRATION_GOVTECH.md](docs/INTEGRATION_GOVTECH.md)).
 
 ## Тесты
 
