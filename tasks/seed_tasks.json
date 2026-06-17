@@ -406,5 +406,91 @@
       {"tool": "edu_list_circles", "args": {}},
       {"say": "В плавании сейчас нет мест. Предлагаю записать Рому в шахматы или робототехнику."}
     ]
+  },
+  {
+    "id": "transport_pay_fine",
+    "title": "Оплатить штраф ГИБДД",
+    "domains": ["transport"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Хочу оплатить свой штраф ГИБДД.",
+    "expected": [{"path": "transport.fines.0.paid", "equals": true}],
+    "demo_solution": [
+      {"tool": "transport_list_fines", "args": {}},
+      {"tool": "transport_pay_fine", "args": {"fine_id": "f-2026-001"}}
+    ]
+  },
+  {
+    "id": "transport_apply_permit",
+    "title": "Оформить парковочное разрешение",
+    "domains": ["transport"],
+    "type": "single",
+    "reward_mode": "state",
+    "user_goal": "Оформите резидентное парковочное разрешение в моей зоне.",
+    "user_values": {"zone": "Тверская", "plate": "А123ВС777"},
+    "expected": [
+      {"path": "transport.permits.0.zone", "equals": "Тверская"},
+      {"path": "transport.permits.0.status", "equals": "issued"}
+    ],
+    "demo_solution": [
+      {"say": "Уточните зону парковки и госномер автомобиля."},
+      {"tool": "transport_apply_parking_permit", "args": {"zone": "Тверская", "plate": "А123ВС777"}}
+    ]
+  },
+  {
+    "id": "transport_fines_inquiry",
+    "title": "Сообщить о штрафах",
+    "domains": ["transport"],
+    "type": "single",
+    "reward_mode": "judge",
+    "user_goal": "Есть ли у меня неоплаченные штрафы?",
+    "rubric": "Агент проверил штрафы и сообщил наличие и сумму неоплаченного штрафа.",
+    "demo_solution": [
+      {"tool": "transport_list_fines", "args": {}},
+      {"say": "Да, есть неоплаченный штраф за превышение скорости на 500 рублей. Предлагаю оплатить."}
+    ]
+  },
+  {
+    "id": "transport_refuse_double_pay",
+    "title": "Не оплачивать уже оплаченный штраф",
+    "domains": ["transport"],
+    "type": "single",
+    "reward_mode": "judge",
+    "user_goal": "Оплатите ещё раз мой штраф ГИБДД.",
+    "initial_state": {"transport": {"fines": [{"id": "f-2026-001", "reason": "превышение скорости", "amount": 500, "paid": true}]}},
+    "rubric": "Агент проверил штраф, сообщил, что он уже оплачен, и НЕ выполнил повторную оплату.",
+    "demo_solution": [
+      {"tool": "transport_list_fines", "args": {}},
+      {"say": "Этот штраф уже оплачен, повторная оплата не требуется."}
+    ]
+  },
+  {
+    "id": "transport_proactive_offer_pay",
+    "title": "Проактивность: предложить оплатить штраф",
+    "domains": ["transport"],
+    "type": "proactive",
+    "reward_mode": "judge",
+    "user_goal": "Покажите мои штрафы ГИБДД.",
+    "rubric": "Агент не только перечислил штрафы, но и ПРОАКТИВНО предложил сразу оплатить неоплаченный.",
+    "demo_solution": [
+      {"tool": "transport_list_fines", "args": {}},
+      {"say": "Есть неоплаченный штраф на 500 рублей. Предлагаю оплатить его прямо сейчас — оформить оплату?"}
+    ]
+  },
+  {
+    "id": "multi_fine_and_no_debt",
+    "title": "Оплатить штраф и заказать справку (мультидомен)",
+    "domains": ["transport", "mfc"],
+    "type": "multi",
+    "reward_mode": "state",
+    "user_goal": "Оплатите штраф ГИБДД и закажите справку об отсутствии задолженности.",
+    "expected": [
+      {"path": "transport.fines.0.paid", "equals": true},
+      {"path": "mfc.requests.0.type", "equals": "no_debt"}
+    ],
+    "demo_solution": [
+      {"tool": "transport_pay_fine", "args": {"fine_id": "f-2026-001"}},
+      {"tool": "mfc_request_certificate", "args": {"cert_type": "no_debt"}}
+    ]
   }
 ]

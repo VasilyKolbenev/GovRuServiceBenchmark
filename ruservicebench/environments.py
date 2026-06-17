@@ -184,7 +184,52 @@ class MFC(Domain):
         return req or {"ok": False, "error": "request_not_found"}
 
 
-DOMAINS = {"jkh": JKH, "edu": EDU, "mfc": MFC}
+TRANSPORT_DEFAULT = {
+    "fines": [
+        {"id": "f-2026-001", "reason": "превышение скорости", "amount": 500, "paid": False},
+    ],
+    "permits": [],
+}
+
+
+class Transport(Domain):
+    name = "transport"
+    default_state = TRANSPORT_DEFAULT
+
+    def __init__(self):
+        super().__init__()
+        self.tools = {
+            "transport_list_fines": self.list_fines,
+            "transport_pay_fine": self.pay_fine,
+            "transport_apply_parking_permit": self.apply_parking_permit,
+        }
+
+    def tool_specs(self):
+        return [
+            {"name": "transport_list_fines", "description": "Список штрафов ГИБДД", "params": {}},
+            {"name": "transport_pay_fine", "description": "Оплатить штраф ГИБДД по id", "params": {"fine_id": "str"}},
+            {"name": "transport_apply_parking_permit", "description": "Оформить резидентное парковочное разрешение",
+             "params": {"zone": "str", "plate": "str"}},
+        ]
+
+    def list_fines(self):
+        return self.state["fines"]
+
+    def pay_fine(self, fine_id):
+        for f in self.state["fines"]:
+            if f["id"] == fine_id:
+                if f["paid"]:
+                    return {"ok": False, "error": "already_paid", "fine_id": fine_id}
+                f["paid"] = True
+                return {"ok": True, "fine_id": fine_id, "paid": True}
+        return {"ok": False, "error": "fine_not_found"}
+
+    def apply_parking_permit(self, zone, plate):
+        self.state["permits"].append({"zone": zone, "plate": plate, "status": "issued"})
+        return {"ok": True, "zone": zone, "plate": plate, "status": "issued"}
+
+
+DOMAINS = {"jkh": JKH, "edu": EDU, "mfc": MFC, "transport": Transport}
 
 
 class Environment:

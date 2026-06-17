@@ -57,5 +57,35 @@ class TestMfc(unittest.TestCase):
             self._env().call_tool("does_not_exist", {})
 
 
+class TestTransport(unittest.TestCase):
+    def _env(self, init=None):
+        env = Environment(["transport"])
+        env.reset(init)
+        return env
+
+    def test_pay_fine_happy_path(self):
+        env = self._env()
+        r = env.call_tool("transport_pay_fine", {"fine_id": "f-2026-001"})
+        self.assertTrue(r["ok"])
+        self.assertTrue(env.composite_state()["transport"]["fines"][0]["paid"])
+
+    def test_pay_already_paid_fine_refused(self):
+        env = self._env({"transport": {"fines": [{"id": "f-2026-001", "amount": 500, "paid": True}]}})
+        r = env.call_tool("transport_pay_fine", {"fine_id": "f-2026-001"})
+        self.assertFalse(r["ok"])
+        self.assertEqual(r["error"], "already_paid")
+
+    def test_pay_unknown_fine_refused(self):
+        r = self._env().call_tool("transport_pay_fine", {"fine_id": "nope"})
+        self.assertFalse(r["ok"])
+        self.assertEqual(r["error"], "fine_not_found")
+
+    def test_apply_parking_permit(self):
+        env = self._env()
+        r = env.call_tool("transport_apply_parking_permit", {"zone": "Тверская", "plate": "А123ВС777"})
+        self.assertTrue(r["ok"])
+        self.assertEqual(env.composite_state()["transport"]["permits"][0]["zone"], "Тверская")
+
+
 if __name__ == "__main__":
     unittest.main()
