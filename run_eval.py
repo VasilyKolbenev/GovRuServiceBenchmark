@@ -107,6 +107,12 @@ def main():
         agent = build_agent(args.agent, llm)
         scripted_user = False
         name = args.agent
+        if args.agent == "reference":  # различать вендоры/модели в сравнении портала
+            model = os.getenv("LLM_MODEL", "").strip()
+            provider = os.getenv("LLM_PROVIDER", "").strip().lower()
+            label = model if (model and "/" not in model) else provider
+            if label:
+                name = f"reference:{label}"
 
     runs, summary = run_suite(tasks, agent, llm, judge_llm=judge_llm,
                               runs=args.runs, k_max=k, scripted_user=scripted_user)

@@ -60,6 +60,10 @@ python run_eval.py --agent reference --limit 3             # первые 3 за
 `LLM_JUDGE_PROVIDER` / `LLM_JUDGE_MODEL` / `LLM_JUDGE_API_KEY` / `LLM_JUDGE_BASE_URL`.
 Anthropic и GigaChat — пока заглушки.
 
+Прогон `reference` на разных вендорах сохраняется отдельно (по модели) — вкладка
+«Сравнение версий» в портале показывает их **рядом** (вендор-бенчмарк: кто надёжнее на
+русских госуслугах). Сбросить накопленное сравнение — очистить `out/agents/`.
+
 ## Тесты
 
 ```bash

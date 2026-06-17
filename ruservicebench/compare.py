@@ -63,7 +63,7 @@ def _svg_compare_bars(agents: list[dict[str, Any]]) -> str:
             by = y1 - (y1 - top) * val
             parts.append(f'<rect x="{bx:.1f}" y="{by:.1f}" width="{bw:.1f}" height="{y1 - by:.1f}" rx="3" class="{cls}"/>')
             parts.append(f'<text x="{bx + bw / 2:.1f}" y="{by - 6:.1f}" class="val" text-anchor="middle">{_pct(val)}</text>')
-        parts.append(f'<text x="{cx:.1f}" y="{y1 + 18:.1f}" class="ax" text-anchor="middle">{a["name"][:16]}</text>')
+        parts.append(f'<text x="{cx:.1f}" y="{y1 + 18:.1f}" class="ax" text-anchor="middle">{a["name"][:20]}</text>')
     return (f'<svg viewBox="0 0 {w} {h}" class="chart" role="img" aria-label="Сравнение pass по агентам">'
             + "".join(parts) + "</svg>")
 
